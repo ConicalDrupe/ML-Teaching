@@ -1,0 +1,64 @@
+---
+title: Example
+format: html
+---
+
+# Time Series
+- Data that is dependent on time
+- i.e this data is non-tabular. It has an ordering to it.
+
+
+<p> Ex. Meals I have eaten vs. Meals I eat throughout the day </p>
+- One is a dictionary of my meals, in no particular order.
+- The other is a journey of what I eat. I eat an sandwich at noon after eating eggs in the morning.
+
+<!-- ## Technical Definition -->
+<!-- $$ y_{t} = e_{t}*y_{t-1} $$ -->
+
+## Potential Properties
+- Stationarity: 
+- Seasonality
+- Autocorrelation
+
+### Decomposition
+
+```{python}
+import pandas as pd
+import os 
+
+df = pd.read_csv(os.path.join(os.getcwd(),'Hourly.csv'),delimiter="\t")
+
+```
+
+```{python}
+print(df.head())
+```
+
+```{python}
+print(df.info())
+```
+
+```{python}
+print(df.shape)
+df_temp = df.dropna(inplace=False)
+print(df_temp.shape)
+df_temp.to_csv(os.path.join(os.getcwd(),'Hourly_clean.csv'))
+```
+
+Will waves need to be normalized?
+- Scale e06 vs e02
+```{python}
+print(df_temp.describe())
+```
+
+
+```{python}
+print(df['Time'].unique())
+df['temp'] = pd.to_datetime(df['Date'] + ' ' + df['Time'],format='%m-%d-%Y/%H:%M')
+print(df[['temp','Date','Time']].head())
+```
+
+```{python}
+# df['datetime'] = pd.to_datetime(df['Date'] + df['Time'], format='%m-%d-%Y%H:%M')
+# print(df.head())
+```
