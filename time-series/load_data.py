@@ -20,6 +20,12 @@ def recursivePrintShape(dirName):
 def na_check(df):
     pass
 
+
+def pdropna(df):
+    print(df.shape)
+    df_temp = df.dropna(inplace=False)
+    print(df_temp.shape)
+
 if __name__ == "__main__":
     recursivePrintShape('Hourly')
     recursivePrintShape('Daily')

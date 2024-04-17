@@ -25,40 +25,33 @@ format: html
 ```{python}
 import pandas as pd
 import os 
+# from time-series_files.clean_data import check
 
-df = pd.read_csv(os.path.join(os.getcwd(),'Hourly.csv'),delimiter="\t")
+df = pd.read_csv(os.path.join(os.getcwd(),'Hourly_clean2.csv'))
+# check(df)
+df.describe()
 
-```
-
-```{python}
-print(df.head())
-```
-
-```{python}
-print(df.info())
-```
-
-```{python}
-print(df.shape)
-df_temp = df.dropna(inplace=False)
-print(df_temp.shape)
-df_temp.to_csv(os.path.join(os.getcwd(),'Hourly_clean.csv'))
-```
-
-Will waves need to be normalized?
-- Scale e06 vs e02
-```{python}
-print(df_temp.describe())
 ```
 
 
 ```{python}
-print(df['Time'].unique())
-df['temp'] = pd.to_datetime(df['Date'] + ' ' + df['Time'],format='%m-%d-%Y/%H:%M')
-print(df[['temp','Date','Time']].head())
+print(df['datetime'].nunique())
+print(df['Date'].nunique())
+print(df['Time'].nunique())
 ```
 
 ```{python}
-# df['datetime'] = pd.to_datetime(df['Date'] + df['Time'], format='%m-%d-%Y%H:%M')
-# print(df.head())
+print(df.dtypes)
+```
+
+### Odd Number of Dates. We would expect 365
+
+```{python}
+print(df.groupby(by =  ['datetime']).mean())
+# print(df['Time'].avg())
+# print(df['datetime'].mean())
+```
+
+```{python}
+print(list(df.columns))
 ```
