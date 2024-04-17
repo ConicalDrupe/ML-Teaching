@@ -1,0 +1,14 @@
+---
+title: Regression basics in R
+format: html
+---
+
+
+```{r}
+library(reticulate)
+library(ggplot2)
+library(GGally)
+library(dplyr)
+
+data <- read.csv('~/Projects/ML-Teaching/Regression/housing_clean.csv')
+```
