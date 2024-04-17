@@ -1,0 +1,40 @@
+---
+title: Regression basics
+format: html
+---
+
+
+```{python}
+import os
+import pandas as pd
+one_back = os.path.normpath(os.getcwd() + os.sep + os.pardir)
+
+df = pd.read_csv(os.path.join(one_back,'housing_clean.csv'))
+```
+
+```{python}
+print(df.columns)
+print(df.head())
+```
+
+# Insert EDA Here
+## I may prefer R here
+- PairPlots
+- Coorelation Matrices
+- Scatter Plots
+- Historgram, with grouping
+
+
+# Is there multicorilinearity?
+```{r}
+```
+
+```{python}
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+coor_mat = df.corr()
+sns.heatmap(coor_mat, annot=True)
+plt.show()
+```
+

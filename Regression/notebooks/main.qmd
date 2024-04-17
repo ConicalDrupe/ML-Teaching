@@ -1,0 +1,15 @@
+---
+title: Regression basics
+format: html
+---
+
+
+```{python}
+import os
+import pandas
+
+df = pd.read_csv(os.path.join(os.getcwd(),''))
+```
+
+```{r}
+```
