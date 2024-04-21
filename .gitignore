@@ -1,4 +1,6 @@
 time-series/time-series_files/*
+time-series/*.html
+time-series/*.ipynb
 time-series/data/*
 Regression/Regression_files/*
 Regression/notebooks/R_files/*
