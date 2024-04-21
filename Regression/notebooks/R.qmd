@@ -9,6 +9,95 @@ library(reticulate)
 library(ggplot2)
 library(GGally)
 library(dplyr)
+# library("tidyverse")
 
-data <- read.csv('~/Projects/ML-Teaching/Regression/housing_clean.csv')
+data <- read.csv("~/Projects/ML-Teaching/Regression/housing_clean.csv")
+```
+
+```{r}
+print(typeof(data))
+```
+
+```{r}
+anyNA(data)
+# No NA in table
+```
+
+```{r}
+summary(data)
+```
+
+```{r}
+house_counts <- data %>% filter("total_bedrooms" > 1)
+head(house_counts)
+```
+
+```{r}
+# Houses / pop
+data$houses_per_pop = data$households / data$population
+data$bedrooms_ratio = data$total_bedrooms / data$total_rooms
+summary(data$houses_per_pop)
+```
+
+```{r}
+plotCorr <- function(df,features){
+  df <- df[features]
+  ggcorr(df, label = T, hjust = 1, layout.exp = 3)
+}
+
+base<- c("median_house_value",
+  "median_income")
+eng <- c("houses_per_pop","bedrooms_ratio")
+eng2 <- c("bedrooms_ratio")
+# eng3 <- c()
+geom <- c("latitude","longitude")
+unused <- c("houses_available","bedrooms_per_house")
+
+selected <- c(base,eng,geom) #concat vectors
+data_clean <- data[selected] #subset of data
+#Ex. Use of plotCorr
+plotCorr(data_clean,selected)
+```
+
+```{r}
+selected2 <- c(base,eng2,geom) #concat vectors
+plotCorr(data_clean,selected2)
+```
+
+### After seeing the above
+- Lets remove bedrooms per house
+  - correlated with median_income
+- Median income is coorelated with median_income
+  - What enigneered variable can we create?
+
+```{r}
+#split data 
+RNGkind(sample.kind = "Rounding")
+set.seed(417)
+data<-data_clean
+idx <- sample(nrow(data), nrow(data)* 0.8)
+
+data_train <- data[idx,]
+
+data_test <- data[ -idx,]
+```
+
+```{r}
+ggcorr(data_train, label = T, hjust = 1, layout.exp = 3)
+```
+
+### Pairplot
+
+```{r}
+# Pairplot
+# ggpairs(data_train)
+```
+
+# model
+```{r}
+b <- paste(data_train$names.kept, collapse="+")
+model = lm(paste("median_house_value ~ ",b,sep = "", data=data_train)
+
+summary(model)
+sigma(model)
 ```
