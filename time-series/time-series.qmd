@@ -27,7 +27,7 @@ import pandas as pd
 import os 
 # from time-series_files.clean_data import check
 
-df = pd.read_csv(os.path.join(os.getcwd(),'Hourly_clean2.csv'))
+df = pd.read_csv(os.path.join(os.getcwd(),'data','Hourly_clean2.csv'))
 # check(df)
 df.describe()
 
