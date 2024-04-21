@@ -11,6 +11,7 @@ def check(df):
 
 def clean(df,save_path ='Hourly_clean2.csv'):
     df['datetime'] = pd.to_datetime(df['Date'] + df['Time'], format='%m/%d/%Y%H:%M')
+    df = df.drop(['Date','Time'])
     print(df.head())
     df.to_csv(os.path.join(os.getcwd(),'data',save_path),index = False)
 

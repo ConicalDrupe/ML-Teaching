@@ -28,30 +28,55 @@ import os
 # from time-series_files.clean_data import check
 
 df = pd.read_csv(os.path.join(os.getcwd(),'data','Hourly_clean2.csv'))
+df = df.drop('Unnamed: 0',axis=1,inplace=False)
 # check(df)
 df.describe()
 
-```
-
-
-```{python}
-print(df['datetime'].nunique())
-print(df['Date'].nunique())
-print(df['Time'].nunique())
 ```
 
 ```{python}
 print(df.dtypes)
 ```
 
-### Odd Number of Dates. We would expect 365
-
-```{python}
-print(df.groupby(by =  ['datetime']).mean())
-# print(df['Time'].avg())
-# print(df['datetime'].mean())
-```
-
 ```{python}
 print(list(df.columns))
 ```
+
+```{python}
+df['datetime'] = pd.to_datetime(df['datetime'])
+# df = df.set_index('datetime')
+```
+
+# Looking at recent years
+```{python}
+# print(df['datetime'].year.unique())
+# print(df.index.year.unique())
+# from statsmodels.tsa.seasonal import seasonal_decompose
+```
+
+```{python}
+df['Datetime'] = pd.to_datetime(df['Date'] + df['Time'], format='%m/%d/%Y%H:%M')
+```
+
+<!---->
+<!-- ```{r} -->
+<!-- library(reticulate) -->
+<!-- library(dplyr) -->
+<!-- library(ggplot2) -->
+<!---->
+<!-- myts <- ts(py$df,start=c(2015,1),frequency=24*365.25) -->
+<!-- colnames(myts) -->
+<!-- ``` -->
+<!---->
+<!-- ```{r} -->
+<!-- # Most basic bubble plot -->
+<!-- p <- ggplot(myts, aes(x=Datetime, y=T_60cm)) + -->
+<!--   geom_line() +  -->
+<!--   xlab("") -->
+<!-- p -->
+<!-- ``` -->
+<!---->
+<!-- ```{r} -->
+<!-- decomp <-decompose(myts$T_60cm) -->
+<!-- plot(decomp) -->
+<!-- ``` -->
