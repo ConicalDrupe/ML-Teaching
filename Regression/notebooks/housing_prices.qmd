@@ -1,0 +1,145 @@
+---
+title: Regression basics
+format: html
+---
+
+
+ Importing Data using pandas
+- os.getcwd() - gets current working directory
+- pd.read_csv(csv_path)
+
+```{python}
+import os
+import pandas as pd
+import random
+
+random.seed(1337)
+
+one_back = os.path.normpath(os.getcwd() + os.sep + os.pardir)
+
+df = pd.read_csv(os.path.join(one_back,'housing_clean.csv'))
+```
+
+```{python}
+print(df.columns)
+print(df.head())
+
+pd.options.display.max_rows=None
+pd.options.display.max_columns=None
+```
+
+# Insert EDA Here
+## I may prefer R here
+- PairPlots
+- Coorelation Matrices
+- Scatter Plots
+- Historgram, with grouping
+
+
+
+# Feature Engineering
+- bedrooms_per_house = total_bedrooms/households
+- houses_available = households/population
+- bedrooms_per_room = bedrooms_per_house/total_bedrooms
+
+
+ Not a descriptive feature
+```{python}
+df['bedrooms_per_room']=df['bedrooms_per_house']/df['total_bedrooms']
+```
+
+```{python}
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+def corr_plot(df):
+    coor_mat = df.select_dtypes(include='number').corr()
+    sns.heatmap(coor_mat, annot=True)
+    plt.show()
+
+corr_plot(df)
+```
+
+Basic Regression Model - No Feature Engineering
+- Select Data
+- Scale/Normalize Data
+- Training and Testing Split
+```{python}
+from sklearn.linear_model import LinearRegression
+from sklearn.preprocessing import StandardScaler
+from sklearn.model_selection import train_test_split
+
+basic_features = ['median_income','households']
+
+X = df[basic_features]
+y = df['median_house_value']
+
+scalar = StandardScaler()
+# Fit scalar and perform z-score standardization on features.
+Xs = scalar.fit_transform(X)
+
+# Split the data into 80% Training and 20% Test
+x_train, x_test, y_train, y_test = train_test_split(Xs,y,test_size=0.2)
+
+
+# Create LinearRegression Model and Fit
+lr = LinearRegression()
+lr.fit(x_train,y_train)
+
+print('Coefficients fit: ',lr.coef_)
+```
+
+
+# Predictions
+```{python}
+from sklearn.metrics import mean_squared_error, root_mean_squared_error ,mean_absolute_error
+
+def run_metrics(x_train,x_test,y_train,y_test,model):
+    y_hat = model.predict(x_test)
+    y_obs_hat = model.predict(x_train)
+
+    # Calculating Residuals (different from errors - which is observed values, lr.predict(y_train) - y_train)
+    mse = mean_squared_error(y_test,y_hat)
+    rmse = root_mean_squared_error(y_test,y_hat)
+    mae = mean_absolute_error(y_test,y_hat)
+
+    obs_mse = mean_squared_error(y_train,y_obs_hat)
+    obs_rmse = root_mean_squared_error(y_train,y_obs_hat)
+    obs_mae = mean_absolute_error(y_train,y_obs_hat)
+
+    print('')
+    print('-'*5,' Training ','-'*6)
+    print('MSE: ',mse)
+    print('RMSE: ',rmse)
+    print('MAE: ',mae)
+    print('-'*25)
+    print('')
+    print('-'*5,' Validation ','-'*5)
+    print('MSE: ',obs_mse)
+    print('RMSE: ',obs_rmse)
+    print('MAE: ',obs_mae)
+    print('-'*25)
+
+run_metrics(x_train,x_test,y_train,y_test,lr)
+```
+
+```{python}
+engineered_features = ['median_income','bedrooms_per_house','houses_available']
+
+X = df[engineered_features]
+y = df['median_house_value']
+
+scalar = StandardScaler()
+# Fit scalar and perform z-score standardization on features.
+Xs = scalar.fit_transform(X)
+
+# Split the data into 80% Training and 20% Test
+x_train, x_test, y_train, y_test = train_test_split(Xs,y,test_size=0.2)
+
+
+# Create LinearRegression Model and Fit
+lr = LinearRegression()
+lr.fit(x_train,y_train)
+
+run_metrics(x_train,x_test,y_train,y_test,lr)
+```
