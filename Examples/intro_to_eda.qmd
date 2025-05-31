@@ -51,6 +51,10 @@ ax = sns.histplot(data=X,x='sex')
 ax.set_title('Balance of Sex in Data')
 plt.show()
 
+# ax = sns.histplot(data=X,x='s4',binwidth=1)
+# ax.set_title('Balance of S4 in Data')
+# plt.show()
+
 
 ax = sns.kdeplot(data=y)
 ax.set_title('Distribution of Progression after 1 year since Baseline')
@@ -67,7 +71,7 @@ corr = total.select_dtypes(include='number').corr()
 
 cmap = sns.diverging_palette(230, 20, as_cmap=True)
 
-sns.heatmap(corr,cmap=cmap)
+sns.heatmap(corr,cmap=cmap,annot=True)
 
 plt.show()
 ```
@@ -76,5 +80,6 @@ plt.show()
 ### Pair Plots
 - Distributions and Correlations in one
 ```{python}
-sns.pair_plot(X)
+sns.pairplot(X,hue='sex')
+plt.show()
 ```
