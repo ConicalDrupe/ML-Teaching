@@ -1,0 +1,19 @@
+
+```{python}
+from sklearn.datasets import load_diabetes
+
+X,y = load_diabetes(return_X_y=True,as_frame=True,scaled=False)
+
+print(X.head())
+```
+
+
+# Intro to EDA
+- descriptive statistics
+- historgram/distribution
+- boxplot
+- corr plot
+```{python}
+X.describe()
+# y.describe()
+```

@@ -1,0 +1,80 @@
+```{python}
+from sklearn.datasets import load_diabetes
+
+X,y = load_diabetes(return_X_y=True,as_frame=True,scaled=False)
+
+print(X.head())
+```
+
+
+# Intro to EDA
+- descriptive statistics
+- historgram/distribution
+- boxplot
+- corr plot
+
+## Descriptive Statistics
+- Note Mean,Std, etc.
+- s3 looks to have low varience, probably not a good predictor
+- sex looks like a binary encoded - roughly split
+
+```{python}
+X.describe()
+# y.describe()
+```
+
+### Box and whisker plot
+
+```{python}
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+columns = ['bmi','bp','s1','s2','sex']
+
+fig, axes = plt.subplots(1,2,figsize=(15,8))
+
+sns.boxplot(data=X[columns],ax=axes[0],orient='h')
+
+sns.boxplot(data=X,
+            x='bmi',
+            hue='sex',
+            ax=axes[1])
+
+plt.show()
+```
+
+### Distributions
+- looking at target
+```{python}
+
+ax = sns.histplot(data=X,x='sex')
+ax.set_title('Balance of Sex in Data')
+plt.show()
+
+
+ax = sns.kdeplot(data=y)
+ax.set_title('Distribution of Progression after 1 year since Baseline')
+plt.show()
+```
+
+### Correlation
+
+```{python}
+import pandas as pd
+
+total = pd.concat([X,y],axis=1)
+corr = total.select_dtypes(include='number').corr()
+
+cmap = sns.diverging_palette(230, 20, as_cmap=True)
+
+sns.heatmap(corr,cmap=cmap)
+
+plt.show()
+```
+
+
+### Pair Plots
+- Distributions and Correlations in one
+```{python}
+sns.pair_plot(X)
+```
