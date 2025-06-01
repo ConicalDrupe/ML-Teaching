@@ -1,6 +1,11 @@
 
 ```{python}
 from sklearn.datasets import load_diabetes
+import pandas as pd
+import numpy as np
+
+
+np.random.seed(1337) # setting seed for repeatability
 
 X,y = load_diabetes(return_X_y=True,as_frame=True,scaled=False)
 
@@ -9,11 +14,131 @@ print(X.head())
 
 
 # Intro to EDA
-- descriptive statistics
-- historgram/distribution
-- boxplot
-- corr plot
+- Let's just use correlation for now
+- There are more nuanced ways to select features -> VIF, gridsearch, domain knowledge
+
 ```{python}
 X.describe()
-# y.describe()
+```
+
+
+# Scaling Data
+- Using z-score $\frac{x-\mu}{\sigma}$
+
+```{python}
+from sklearn.preprocessing import StandardScaler
+
+
+def preprocess_data(X):
+    scaler = StandardScaler()
+
+    X_scaled = scaler.fit_transform(X)
+    return X_scaled, scaler
+```
+
+# Training and Testing Split
+- We start with an 80/20
+
+```{python}
+from sklearn.model_selection import train_test_split
+
+
+def split(X_scaled,y,train_size=0.8):
+
+    X_train,X_test, y_train, y_test = train_test_split(X_scaled,y,train_size=train_size,shuffle=True,random_state=1337)
+
+    return X_train,X_test,y_train,y_test
+
+```
+
+# Training Model
+
+## Model 1 - BMI and age
+
+```{python}
+from sklearn.linear_model import LinearRegression
+
+basic_features = ['age']
+
+basic_data = X[basic_features]
+X_scaled,_ = preprocess_data(basic_data)
+X_train, X_test, y_train, y_test = split(X_scaled,y,train_size=0.8)
+
+lr = LinearRegression()
+
+lr.fit(X_train,y_train)
+
+```
+
+## Model 1 - Prediction and Metrics
+- Shows underfit 
+- Train Loss High , Validation Loss high
+
+```{python}
+from sklearn.metrics import root_mean_squared_error, mean_squared_error, mean_absolute_error
+
+def predict_on_set(model,x_val,y_true):
+    y_pred = model.predict(x_val)
+    rmse = root_mean_squared_error(y_true,y_pred)
+    mse = mean_squared_error(y_true,y_pred)
+    mae = mean_absolute_error(y_true,y_pred)
+
+    print('RMSE: ',rmse)
+    print('MSE: ',mse)
+    print('MAE: ',mae)
+
+print("Training")
+predict_on_set(lr,X_train,y_train)
+print("Validation")
+predict_on_set(lr,X_test,y_test)
+
+```
+
+
+## Model 2 - Overfit Small Data and Or Redundancy
+- Train Loss low, Validation Loss high
+
+```{python}
+
+total = pd.concat([X,y],axis=1)
+temp = total.sample(60,random_state=1337)
+X_small = temp.loc[:,temp.columns != 'target']
+y_small = temp['target']
+
+
+X_scaled,_ = preprocess_data(X_small)
+X_train, X_test, y_train, y_test = split(X_scaled,y_small,train_size=0.8)
+
+lr = LinearRegression()
+
+lr.fit(X_train,y_train)
+
+print("Training")
+predict_on_set(lr,X_train,y_train)
+print("Validation")
+predict_on_set(lr,X_test,y_test)
+
+```
+
+## Model 3 - Just Right
+- Training Loss Low, Validation Loss Low
+- Sanity Check: Training Loss < Validation Loss. If Train_loss > Validation_loss, this does not make much sense in ML context.
+
+```{python}
+
+selected_features = ['bmi','bp']
+
+
+X_scaled,_ = preprocess_data(X[selected_features])
+X_train, X_test, y_train, y_test = split(X_scaled,y,train_size=0.6)
+
+lr = LinearRegression()
+
+lr.fit(X_train,y_train)
+
+print("Training")
+predict_on_set(lr,X_train,y_train)
+print("Validation")
+predict_on_set(lr,X_test,y_test)
+
 ```
