@@ -1,0 +1,209 @@
+
+```{python}
+import pandas as pd
+from sklearn.datasets import fetch_california_housing
+
+# Fetching raw data
+raw_data = fetch_california_housing(as_frame=True)
+
+# Using dictionary keys to access pandas df and series
+X = raw_data['data']
+y = raw_data['target']
+# Concatenating into 1 dataframe, cuz frick it
+df = pd.concat([X,y],axis=1)
+
+# Look at head of dataframe
+print(df.head())
+```
+
+# EDA - Exploratory Data Analysis
+
+```{python}
+pd.options.display.max_rows = None
+pd.options.display.max_columns = None
+print(df.describe())
+
+print(df.columns)
+```
+
+## Visuals
+
+### Average Occupancy
+    - Many Homes, some apartment complexes
+```{python}
+import seaborn as sns
+import matplotlib.pyplot as plt
+
+sns.boxplot(data=df,x='AveOccup')
+plt.show()
+```
+
+### Median Income
+
+```{python}
+plt.figure()
+sns.histplot(data=df,x='MedInc')
+# sns.kdeplot(data=df,x='MedInc')
+# plt.show()
+
+print('Median Income Median',df['MedInc'].median())
+```
+
+### Pair-Plot
+- Correlation between variables
+- Probability Distribution (KDE - Kernal Density Estimation)
+
+```{python}
+col_to_view = ['MedInc', 'HouseAge', 'AveRooms', 'AveBedrms', 'AveOccup', 'MedHouseVal']
+view = df[col_to_view]
+
+
+# SIDE NOTE on Indexing Dataframes!
+# one variable
+s = df['MedInc'] # returns series 1D
+print(s)
+# Multiple
+df2 = df[['MedInc','HouseAge']]
+```
+
+```{python}
+plt.figure()
+sns.pairplot(data=view)
+plt.tight_layout()
+plt.show()
+```
+
+### Correlation Heatmap
+
+
+```{python}
+corr_cols = ['MedInc', 'HouseAge', 'AveRooms', 'AveBedrms', 'Population', 'AveOccup','MedHouseVal']
+corr_df = df[corr_cols]
+
+corr_df['BedsPerRooms'] = corr_df['AveBedrms']/corr_df['AveRooms']
+corr_df['OccupentsPerPerson'] = corr_df['AveOccup']/corr_df['Population']
+
+# Calculate pearson correlation coefficients
+corr_matrix = corr_df.corr()
+sns.heatmap(corr_matrix,annot=True,cmap='crest')
+plt.show()
+```
+
+# Modeling First Cycle
+
+## Choose Columns first
+```{python}
+df['BedsPerRooms'] = df['AveBedrms']/df['AveRooms']
+
+X = df[['MedInc','Population']]
+y = df['MedHouseVal']
+```
+
+
+## Standardization (Rescaling data)
+
+
+## Test and Train Split
+
+```{python}
+from sklearn.model_selection import train_test_split
+x_train,x_test, y_train, y_test = train_test_split(X,y,train_size=0.8,random_state=1337)
+
+print('x train size',x_train.shape)
+print('x test size',x_test.shape)
+print('y train size',y_train.shape)
+print('y test size',y_test.shape)
+```
+
+```{python}
+from sklearn.preprocessing import StandardScaler
+
+scaler = StandardScaler()
+
+scaler.fit(x_train)
+x_train_scaled = scaler.transform(x_train)
+x_test_scaled = scaler.transform(x_test)
+```
+
+## Model Training
+
+```{python}
+from sklearn.linear_model import LinearRegression
+
+lr = LinearRegression()
+
+# Train on the training sets. Inputs and Labels
+lr.fit(x_train_scaled,y_train)
+```
+
+# Predict and Evaluate
+```{python}
+from sklearn.metrics import mean_squared_error, root_mean_squared_error
+
+def calculate_metrics(x_input,y_actuals):
+    """
+    Used for either Training or Testing Metric evaluation
+    """
+    y_pred = lr.predict(x_input)
+
+    mse = mean_squared_error(y_pred,y_actuals)
+    rmse = root_mean_squared_error(y_pred,y_actuals)
+
+    print('MSE:',mse)
+    print('RMSE:',rmse)
+
+# Calculate error/loss. Need Predictions and Actuals/Labels
+# Broken up into training and testing
+print('Training Evaluation')
+calculate_metrics(x_train_scaled,y_train)
+
+print('Testing Evaluation')
+calculate_metrics(x_test_scaled,y_test)
+```
+
+### Checking Target Variable, see if error of $83,000 is okay
+```{python}
+sns.histplot(y_train)
+plt.show()
+```
+
+# Model 2
+## Choose Columns first
+```{python}
+
+X = df[['MedInc','BedsPerRooms','AveOccup','Population','Latitude','Longitude']]
+y = df['MedHouseVal']
+
+from sklearn.model_selection import train_test_split
+x_train,x_test, y_train, y_test = train_test_split(X,y,train_size=0.8,random_state=1337)
+
+print('x train size',x_train.shape)
+print('x test size',x_test.shape)
+print('y train size',y_train.shape)
+print('y test size',y_test.shape)
+
+from sklearn.preprocessing import StandardScaler
+
+scaler = StandardScaler()
+
+scaler.fit(x_train)
+x_train_scaled = scaler.transform(x_train)
+x_test_scaled = scaler.transform(x_test)
+
+## Model Training
+
+lr = LinearRegression()
+
+# Train on the training sets. Inputs and Labels
+lr.fit(x_train_scaled,y_train)
+
+# Predict and Evaluate
+
+# Calculate error/loss. Need Predictions and Actuals/Labels
+# Broken up into training and testing
+print('Training Evaluation')
+calculate_metrics(x_train_scaled,y_train)
+
+print('Testing Evaluation')
+calculate_metrics(x_test_scaled,y_test)
+```
